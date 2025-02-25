@@ -1,0 +1,89 @@
+// WEBDRIVER AND BROWSER SETUP
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+
+public class BaseTest {
+    WebDriver driver;
+
+    @BeforeMethod
+    public void setup() {
+        System.setProperty("webdriver.chrome.driver", "path/to/chromedriver");
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://demo.opencart.com");  
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        driver.quit();
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//AUTOMATED LOGIN TEST
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+public class LoginTest extends BaseTest {
+
+    @Test
+    public void loginTest() {
+        
+        driver.findElement(By.linkText("My Account")).click();
+        driver.findElement(By.linkText("Login")).click();
+
+        WebElement emailField = driver.findElement(By.id("input-email"));
+        WebElement passwordField = driver.findElement(By.id("input-password"));
+        WebElement loginButton = driver.findElement(By.xpath("//input[@value='Login']"));
+
+        emailField.sendKeys("testuser@example.com");
+        passwordField.sendKeys("password123");
+        loginButton.click();
+
+        WebElement accountDashboard = driver.findElement(By.linkText("Edit your account information"));
+        Assert.assertTrue(accountDashboard.isDisplayed(), "Login failed!");
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+//AUTOMATED PROJECT SEARCH TEST
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+public class SearchTest extends BaseTest {
+
+    @Test
+    public void productSearchTest() {
+       
+        WebElement searchBox = driver.findElement(By.name("search"));
+        WebElement searchButton = driver.findElement(By.xpath("//button[@class='btn btn-default btn-lg']"));
+
+        searchBox.sendKeys("Laptop");
+        searchButton.click();
+
+        WebElement searchResult = driver.findElement(By.xpath("//h2[contains(text(),'Search - Laptop')]"));
+        Assert.assertTrue(searchResult.isDisplayed(), "Search failed!");
+    }
+}
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//TEST SUITE CONFIGURATION
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Ecommerce Test Suite">
+    <test name="Login and Search Tests">
+        <classes>
+            <class name="LoginTest"/>
+            <class name="SearchTest"/>
+        </classes>
+    </test>
+</suite>
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
